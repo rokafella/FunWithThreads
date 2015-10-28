@@ -1,0 +1,8 @@
+Old Stats:
+
+Rohits-MacBook-Pro:Project Rohit$ ./a.out 
+Boxes: 48 Rows: 16 Columns: 16
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 7130295 microseconds
+Iterations: 72890

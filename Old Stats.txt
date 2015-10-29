@@ -6,3 +6,40 @@ Last Min: 42.5499
 Last Max: 43.8658
 Total duration: 7130295 microseconds
 Iterations: 72890
+
+New Stats:
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 1
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 20855482 microseconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 2
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 13386648 microseconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 4
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 9790910 microseconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 8
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 12247202 microseconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 16
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 21142656 microseconds
+Iterations: 72890

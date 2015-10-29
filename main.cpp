@@ -3,12 +3,16 @@
 #include <vector>
 #include <unordered_map>
 #include <chrono>
+#include <pthread.h>
 
 #define EPSILON 0.0004
 #define DELTA 0.03
 
 using namespace std;
 using namespace std::chrono;
+
+void *calculate_dsv(void *);
+double *temp_holder;
 
 // Struct used to store information about the box
 struct box {
@@ -24,8 +28,12 @@ struct box {
     double dsv;
 };
 
-unordered_map<int, box> map;
+struct arg_struct {
+    int start;
+    int end;
+};
 
+unordered_map<int, box> map;
 
 // This function returns the contact length of any two boxes given the X coordinate
 // of both the boxes and Lengths if the box is on top or bottom, or Width if the
@@ -125,7 +133,14 @@ int main() {
         file >> id;
     }
 
-    double temp_holder[num];
+    file.close();
+
+    int num_threads;
+
+    cout << "Enter the number of threads you need: ";
+    cin >> num_threads;
+
+    pthread_t threads[num_threads];
 
     bool unstable = true;
 
@@ -134,131 +149,153 @@ int main() {
     // Record the time before execution of the logic
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
+    struct arg_struct args[num_threads];
+
+    for (int i = 0; i < num_threads; i++) {
+        args[i].start = (i*(num/num_threads));
+        args[i].end = ((i+1)*(num/num_threads));
+    }
+
     //Dissipation logic
     while(unstable) {
         loops++;
+        temp_holder = new double[num];
 
-        for(int i = 0; i<num; i++) {
-            auto search = map.find(i);
-            box current;
-            current = search->second;
+        for(int i = 0; i<num_threads; i++) {
+            pthread_create(&threads[i], NULL, calculate_dsv, (void *)&args[i]);
+        }
 
-            double surrounding_temp = 0.0;
-            int contact_distance = 0;
+        for(int i=0; i<num_threads; i++) {
+            pthread_join(threads[i], NULL);
+        }
 
-            //Top
-            if(current.top.size() > 0) {
-                vector<int>::iterator v = current.top.begin();
-                while( v != current.top.end()) {
-                    auto temp = map.find(*v);
-                    box top = temp->second;
-                    int contact = findContact(current.x, current.width, top.x, top.width);
-                    surrounding_temp += (contact * top.dsv);
-                    contact_distance += contact;
-                    v++;
-                }
+        double max = temp_holder[0];
+        double min = temp_holder[0];
+
+        for(int j = 0; j<num; j++) {
+            auto seek = map.find(j);
+            seek->second.dsv = temp_holder[j];
+            if(temp_holder[j] > max) {
+                max = temp_holder[j];
             }
-            else {
-                surrounding_temp += current.dsv * current.width;
-                contact_distance += current.width;
-            }
-
-            //Bottom
-            if(current.bottom.size() > 0) {
-                vector<int>::iterator v = current.bottom.begin();
-                while( v != current.bottom.end()) {
-                    auto temp = map.find(*v);
-                    box bottom = temp->second;
-                    int contact = findContact(current.x, current.width, bottom.x, bottom.width);
-                    surrounding_temp += (contact * bottom.dsv);
-                    contact_distance += contact;
-                    v++;
-                }
-            }
-            else {
-                surrounding_temp += current.dsv * current.width;
-                contact_distance += current.width;
-            }
-
-            //Left
-            if(current.left.size() > 0) {
-                vector<int>::iterator v = current.left.begin();
-                while( v != current.left.end()) {
-                    auto temp = map.find(*v);
-                    box left = temp->second;
-                    int contact = findContact(current.y, current.height, left.y, left.height);
-                    surrounding_temp += (contact * left.dsv);
-                    contact_distance += contact;
-                    v++;
-                }
-            }
-            else {
-                surrounding_temp += current.dsv * current.height;
-                contact_distance += current.height;
-            }
-
-            //Right
-            if(current.right.size() > 0) {
-                vector<int>::iterator v = current.right.begin();
-                while( v != current.right.end()) {
-                    auto temp = map.find(*v);
-                    box right = temp->second;
-                    int contact = findContact(current.y, current.height, right.y, right.height);
-                    surrounding_temp += (contact * right.dsv);
-                    contact_distance += contact;
-                    v++;
-                }
-            }
-            else {
-                surrounding_temp += current.dsv * current.height;
-                contact_distance += current.height;
-            }
-
-            double weighted_temp = surrounding_temp / contact_distance;
-
-            double adjusted_temp;
-
-            // Adjust the temperature accordingly
-            if(weighted_temp > current.dsv) {
-                adjusted_temp = current.dsv + (EPSILON * (weighted_temp - current.dsv));
-            }
-            else {
-                adjusted_temp = current.dsv - (EPSILON * (current.dsv - weighted_temp));
-            }
-
-            temp_holder[i] = adjusted_temp;
-
-            //Communicate updated values
-            if(i == num-1) {
-                double max = temp_holder[0];
-                double min = temp_holder[0];
-
-                for(int j = 0; j<num; j++) {
-                    auto seek = map.find(j);
-                    seek->second.dsv = temp_holder[j];
-                    if(temp_holder[j] > max) {
-                        max = temp_holder[j];
-                    }
-                    if(temp_holder[j] < min) {
-                        min = temp_holder[j];
-                    }
-                }
-
-                // If the temperature is within the expected limits end the loop
-                if((max-min) <= (DELTA * max)) {
-                    cout <<"Last Min: "<< min << endl;
-                    cout <<"Last Max: "<< max <<endl;
-                    high_resolution_clock::time_point t2 = high_resolution_clock::now();
-                    auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
-                    cout <<"Total duration: "<< duration <<" microseconds"<< endl;
-                    unstable = false;
-                }
+            if(temp_holder[j] < min) {
+                min = temp_holder[j];
             }
         }
+
+        // If the temperature is within the expected limits end the loop
+        if((max-min) <= (DELTA * max)) {
+            cout <<"Last Min: "<< min << endl;
+            cout <<"Last Max: "<< max << endl;
+            high_resolution_clock::time_point t2 = high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+            cout <<"Total duration: "<< duration <<" microseconds"<< endl;
+            unstable = false;
+        }
+
+        delete [] temp_holder;
     }
 
     cout <<"Iterations: "<< loops << endl;
 
-    file.close();
     return 0;
+}
+
+void *calculate_dsv(void *arguments) {
+
+    struct arg_struct *args = (struct arg_struct *) arguments;
+
+    int start = args->start;
+    int end = args->end;
+
+    for(int i = start; i < end; i++) {
+        auto search = map.find(i);
+        box current;
+        current = search->second;
+
+        double surrounding_temp = 0.0;
+        int contact_distance = 0;
+
+        //Top
+        if(current.top.size() > 0) {
+            vector<int>::iterator v = current.top.begin();
+            while( v != current.top.end()) {
+                auto temp = map.find(*v);
+                box top = temp->second;
+                int contact = findContact(current.x, current.width, top.x, top.width);
+                surrounding_temp += (contact * top.dsv);
+                contact_distance += contact;
+                v++;
+            }
+        }
+        else {
+            surrounding_temp += current.dsv * current.width;
+            contact_distance += current.width;
+        }
+
+        //Bottom
+        if(current.bottom.size() > 0) {
+            vector<int>::iterator v = current.bottom.begin();
+            while( v != current.bottom.end()) {
+                auto temp = map.find(*v);
+                box bottom = temp->second;
+                int contact = findContact(current.x, current.width, bottom.x, bottom.width);
+                surrounding_temp += (contact * bottom.dsv);
+                contact_distance += contact;
+                v++;
+            }
+        }
+        else {
+            surrounding_temp += current.dsv * current.width;
+            contact_distance += current.width;
+        }
+
+        //Left
+        if(current.left.size() > 0) {
+            vector<int>::iterator v = current.left.begin();
+            while( v != current.left.end()) {
+                auto temp = map.find(*v);
+                box left = temp->second;
+                int contact = findContact(current.y, current.height, left.y, left.height);
+                surrounding_temp += (contact * left.dsv);
+                contact_distance += contact;
+                v++;
+            }
+        }
+        else {
+            surrounding_temp += current.dsv * current.height;
+            contact_distance += current.height;
+        }
+
+        //Right
+        if(current.right.size() > 0) {
+            vector<int>::iterator v = current.right.begin();
+            while( v != current.right.end()) {
+                auto temp = map.find(*v);
+                box right = temp->second;
+                int contact = findContact(current.y, current.height, right.y, right.height);
+                surrounding_temp += (contact * right.dsv);
+                contact_distance += contact;
+                v++;
+            }
+        }
+        else {
+            surrounding_temp += current.dsv * current.height;
+            contact_distance += current.height;
+        }
+
+        double weighted_temp = surrounding_temp / contact_distance;
+
+        double adjusted_temp;
+
+        // Adjust the temperature accordingly
+        if(weighted_temp > current.dsv) {
+            adjusted_temp = current.dsv + (EPSILON * (weighted_temp - current.dsv));
+        }
+        else {
+            adjusted_temp = current.dsv - (EPSILON * (current.dsv - weighted_temp));
+        }
+
+        temp_holder[i] = adjusted_temp;
+    }
 }

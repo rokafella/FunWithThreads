@@ -48,40 +48,40 @@ Total duration: 21142656 microseconds
 Iterations: 72890
 
 
-When run on the stdlinux CSE machine:
+When run on the stdlinux (sl4) CSE machine:
 
 Boxes: 48 Rows: 16 Columns: 16
 Enter the number of threads you need: 1
 Last Min: 42.5499
 Last Max: 43.8658
-Total duration: 21186889 microseconds
+Total duration: 8431541 microseconds
 Iterations: 72890
 
 Boxes: 48 Rows: 16 Columns: 16
 Enter the number of threads you need: 2
 Last Min: 42.5499
 Last Max: 43.8658
-Total duration: 16588992 microseconds
+Total duration: 6162151 microseconds
 Iterations: 72890
 
 Boxes: 48 Rows: 16 Columns: 16
 Enter the number of threads you need: 4
 Last Min: 42.5499
 Last Max: 43.8658
-Total duration: 99537352 microseconds
+Total duration: 8402059 microseconds
 Iterations: 72890
 
 Boxes: 48 Rows: 16 Columns: 16
 Enter the number of threads you need: 8
 Last Min: 42.5499
 Last Max: 43.8658
-Total duration: 125591278 microseconds
+Total duration: 37773180 microseconds
 Iterations: 72890
 
 Boxes: 48 Rows: 16 Columns: 16
 Enter the number of threads you need: 16
 Last Min: 42.5499
 Last Max: 43.8658
-Total duration: 335284638 microseconds
+Total duration: 91986440 microseconds
 Iterations: 72890
 

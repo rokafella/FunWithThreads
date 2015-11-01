@@ -28,6 +28,7 @@ struct box {
     double dsv;
 };
 
+// Struct used to pass arguments to pthreads
 struct arg_struct {
     int start;
     int end;
@@ -57,7 +58,7 @@ int findContact(int boxStart, int boxLength, int box2Start, int box2Length) {
 
 int main() {
     ifstream file;
-    file.open("/Users/Rohit/Documents/OSU/Parallel Programming/Project/testgrid_1");
+    file.open("testgrid_1");
     if (!file) {
         cerr << "File not found!" << endl;
         exit(1);
@@ -137,6 +138,7 @@ int main() {
 
     int num_threads;
 
+    // Get number of threads as a user input
     cout << "Enter the number of threads you need: ";
     cin >> num_threads;
 
@@ -151,6 +153,7 @@ int main() {
 
     struct arg_struct args[num_threads];
 
+    // Initialize the arguments to be passed to all threads
     for (int i = 0; i < num_threads; i++) {
         args[i].start = (i*(num/num_threads));
         args[i].end = ((i+1)*(num/num_threads));
@@ -161,10 +164,12 @@ int main() {
         loops++;
         temp_holder = new double[num];
 
+        // Create pthreads and call the thread safe calculate_dsv function with the appropriate argument struct
         for(int i = 0; i<num_threads; i++) {
             pthread_create(&threads[i], NULL, calculate_dsv, (void *)&args[i]);
         }
 
+        // Wait for all threads to complete
         for(int i=0; i<num_threads; i++) {
             pthread_join(threads[i], NULL);
         }
@@ -172,6 +177,7 @@ int main() {
         double max = temp_holder[0];
         double min = temp_holder[0];
 
+        // Communicate the updated temperature
         for(int j = 0; j<num; j++) {
             auto seek = map.find(j);
             seek->second.dsv = temp_holder[j];
@@ -201,6 +207,8 @@ int main() {
     return 0;
 }
 
+// Thread safe function which calculates the temparature of a box based upon the temparature of the surrounding boxes
+// Arguments are the staring and ending ID of the box
 void *calculate_dsv(void *arguments) {
 
     struct arg_struct *args = (struct arg_struct *) arguments;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include <chrono>
+#include <omp.h>
 
 #define EPSILON 0.0004
 #define DELTA 0.03
@@ -49,7 +50,7 @@ int findContact(int boxStart, int boxLength, int box2Start, int box2Length) {
 
 int main() {
     ifstream file;
-    file.open("/Users/Rohit/Documents/OSU/Parallel Programming/Project/testgrid_1");
+    file.open("testgrid_1");
     if (!file) {
         cerr << "File not found!" << endl;
         exit(1);
@@ -125,111 +126,128 @@ int main() {
         file >> id;
     }
 
+    file.close();
+
+    int num_threads;
+
+    cout << "Enter the number of threads you need: ";
+    cin >> num_threads;
+
+    // Set the number of threads
+    omp_set_num_threads(num_threads);
+
     double temp_holder[num];
 
     bool unstable = true;
 
     int loops = 0;
 
+    // For measuring the CPU time
+    clock_t start,end;
+    start = clock();
+
     // Record the time before execution of the logic
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
     //Dissipation logic
     while(unstable) {
-        loops++;
+        #pragma omp parallel
+        {
+            #pragma omp for
+            for(int i = 0; i<num; i++) {
+                auto search = map.find(i);
+                box current;
+                current = search->second;
 
-        for(int i = 0; i<num; i++) {
-            auto search = map.find(i);
-            box current;
-            current = search->second;
+                double surrounding_temp = 0.0;
+                int contact_distance = 0;
 
-            double surrounding_temp = 0.0;
-            int contact_distance = 0;
-
-            //Top
-            if(current.top.size() > 0) {
-                vector<int>::iterator v = current.top.begin();
-                while( v != current.top.end()) {
-                    auto temp = map.find(*v);
-                    box top = temp->second;
-                    int contact = findContact(current.x, current.width, top.x, top.width);
-                    surrounding_temp += (contact * top.dsv);
-                    contact_distance += contact;
-                    v++;
+                //Top
+                if (current.top.size() > 0) {
+                    vector<int>::iterator v = current.top.begin();
+                    while (v != current.top.end()) {
+                        auto temp = map.find(*v);
+                        box top = temp->second;
+                        int contact = findContact(current.x, current.width, top.x, top.width);
+                        surrounding_temp += (contact * top.dsv);
+                        contact_distance += contact;
+                        v++;
+                    }
                 }
-            }
-            else {
-                surrounding_temp += current.dsv * current.width;
-                contact_distance += current.width;
-            }
-
-            //Bottom
-            if(current.bottom.size() > 0) {
-                vector<int>::iterator v = current.bottom.begin();
-                while( v != current.bottom.end()) {
-                    auto temp = map.find(*v);
-                    box bottom = temp->second;
-                    int contact = findContact(current.x, current.width, bottom.x, bottom.width);
-                    surrounding_temp += (contact * bottom.dsv);
-                    contact_distance += contact;
-                    v++;
+                else {
+                    surrounding_temp += current.dsv * current.width;
+                    contact_distance += current.width;
                 }
-            }
-            else {
-                surrounding_temp += current.dsv * current.width;
-                contact_distance += current.width;
-            }
 
-            //Left
-            if(current.left.size() > 0) {
-                vector<int>::iterator v = current.left.begin();
-                while( v != current.left.end()) {
-                    auto temp = map.find(*v);
-                    box left = temp->second;
-                    int contact = findContact(current.y, current.height, left.y, left.height);
-                    surrounding_temp += (contact * left.dsv);
-                    contact_distance += contact;
-                    v++;
+                //Bottom
+                if (current.bottom.size() > 0) {
+                    vector<int>::iterator v = current.bottom.begin();
+                    while (v != current.bottom.end()) {
+                        auto temp = map.find(*v);
+                        box bottom = temp->second;
+                        int contact = findContact(current.x, current.width, bottom.x, bottom.width);
+                        surrounding_temp += (contact * bottom.dsv);
+                        contact_distance += contact;
+                        v++;
+                    }
                 }
-            }
-            else {
-                surrounding_temp += current.dsv * current.height;
-                contact_distance += current.height;
-            }
-
-            //Right
-            if(current.right.size() > 0) {
-                vector<int>::iterator v = current.right.begin();
-                while( v != current.right.end()) {
-                    auto temp = map.find(*v);
-                    box right = temp->second;
-                    int contact = findContact(current.y, current.height, right.y, right.height);
-                    surrounding_temp += (contact * right.dsv);
-                    contact_distance += contact;
-                    v++;
+                else {
+                    surrounding_temp += current.dsv * current.width;
+                    contact_distance += current.width;
                 }
+
+                //Left
+                if (current.left.size() > 0) {
+                    vector<int>::iterator v = current.left.begin();
+                    while (v != current.left.end()) {
+                        auto temp = map.find(*v);
+                        box left = temp->second;
+                        int contact = findContact(current.y, current.height, left.y, left.height);
+                        surrounding_temp += (contact * left.dsv);
+                        contact_distance += contact;
+                        v++;
+                    }
+                }
+                else {
+                    surrounding_temp += current.dsv * current.height;
+                    contact_distance += current.height;
+                }
+
+                //Right
+                if (current.right.size() > 0) {
+                    vector<int>::iterator v = current.right.begin();
+                    while (v != current.right.end()) {
+                        auto temp = map.find(*v);
+                        box right = temp->second;
+                        int contact = findContact(current.y, current.height, right.y, right.height);
+                        surrounding_temp += (contact * right.dsv);
+                        contact_distance += contact;
+                        v++;
+                    }
+                }
+                else {
+                    surrounding_temp += current.dsv * current.height;
+                    contact_distance += current.height;
+                }
+
+                double weighted_temp = surrounding_temp / contact_distance;
+
+                double adjusted_temp;
+
+                // Adjust the temperature accordingly
+                if (weighted_temp > current.dsv) {
+                    adjusted_temp = current.dsv + (EPSILON * (weighted_temp - current.dsv));
+                }
+                else {
+                    adjusted_temp = current.dsv - (EPSILON * (current.dsv - weighted_temp));
+                }
+
+                temp_holder[i] = adjusted_temp;
             }
-            else {
-                surrounding_temp += current.dsv * current.height;
-                contact_distance += current.height;
-            }
 
-            double weighted_temp = surrounding_temp / contact_distance;
-
-            double adjusted_temp;
-
-            // Adjust the temperature accordingly
-            if(weighted_temp > current.dsv) {
-                adjusted_temp = current.dsv + (EPSILON * (weighted_temp - current.dsv));
-            }
-            else {
-                adjusted_temp = current.dsv - (EPSILON * (current.dsv - weighted_temp));
-            }
-
-            temp_holder[i] = adjusted_temp;
-
-            //Communicate updated values
-            if(i == num-1) {
+            #pragma omp master
+            {
+                loops++;
                 double max = temp_holder[0];
                 double min = temp_holder[0];
 
@@ -246,11 +264,14 @@ int main() {
 
                 // If the temperature is within the expected limits end the loop
                 if((max-min) <= (DELTA * max)) {
+                    cout <<"Actual number of threads created: " <<  omp_get_num_threads() << endl;
                     cout <<"Last Min: "<< min << endl;
-                    cout <<"Last Max: "<< max <<endl;
+                    cout <<"Last Max: "<< max << endl;
                     high_resolution_clock::time_point t2 = high_resolution_clock::now();
+                    end = clock();
                     auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
-                    cout <<"Total duration: "<< duration <<" microseconds"<< endl;
+                    cout <<"Total duration (wall clock): "<< (float)duration/1000000 <<" seconds"<< endl;
+                    cout <<"Total CPU clock time: "<< (double) (end - start) / CLOCKS_PER_SEC << " seconds"<< endl;
                     unstable = false;
                 }
             }
@@ -258,7 +279,5 @@ int main() {
     }
 
     cout <<"Iterations: "<< loops << endl;
-
-    file.close();
     return 0;
 }

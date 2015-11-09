@@ -1,54 +1,4 @@
-Sequential Performance:
-
-Boxes: 48 Rows: 16 Columns: 16
-Last Min: 42.5499
-Last Max: 43.8658
-Total duration: 7130295 microseconds
-Iterations: 72890
-
-
-Pthread Performance:
-
-
-When run on my MacBook Pro with i7 quad core and 8 Gigs of RAM:
-
-Boxes: 48 Rows: 16 Columns: 16
-Enter the number of threads you need: 1
-Last Min: 42.5499
-Last Max: 43.8658
-Total duration: 20855482 microseconds
-Iterations: 72890
-
-Boxes: 48 Rows: 16 Columns: 16
-Enter the number of threads you need: 2
-Last Min: 42.5499
-Last Max: 43.8658
-Total duration: 13386648 microseconds
-Iterations: 72890
-
-Boxes: 48 Rows: 16 Columns: 16
-Enter the number of threads you need: 4
-Last Min: 42.5499
-Last Max: 43.8658
-Total duration: 9790910 microseconds
-Iterations: 72890
-
-Boxes: 48 Rows: 16 Columns: 16
-Enter the number of threads you need: 8
-Last Min: 42.5499
-Last Max: 43.8658
-Total duration: 12247202 microseconds
-Iterations: 72890
-
-Boxes: 48 Rows: 16 Columns: 16
-Enter the number of threads you need: 16
-Last Min: 42.5499
-Last Max: 43.8658
-Total duration: 21142656 microseconds
-Iterations: 72890
-
-
-When run on the stdlinux (sl4) CSE machine:
+Pthread "non-persistent threads" Performance:
 
 Boxes: 48 Rows: 16 Columns: 16
 Enter the number of threads you need: 1
@@ -85,3 +35,40 @@ Last Max: 43.8658
 Total duration: 91986440 microseconds
 Iterations: 72890
 
+
+Pthread "persistent threads" Performance:
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 1
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 4.22254 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 2
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 4.30542 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 4
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 6.85354 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 8
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 13.3861 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 16
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration: 23.0489 seconds
+Iterations: 72890

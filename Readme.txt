@@ -1,7 +1,7 @@
 Name: Rohit Kapoor
 Email: kapoor.83@osu.edu
 
-CSE 5441 Lab 1 - Sequential version
+CSE 5441 Lab 2 - OpenMP version
 
 How to execute?
 
@@ -13,10 +13,12 @@ Files:
 1) main.cpp is the main program file.
 2) Makefile is for compiling the program with appropriate flags.
 3) testgrid_1 is the data file which was provided to us.
+4) Report Lab 2 is the report.
 
 Output:
 
 The program will output total number of boxes read, total columns and total rows in the file.
 The next two lines will be the Minimum and Maximum values of the boxes in the last iteration.
 Fourth line will be the total time taken by the convergence loop in microseconds (calculated using chrono).
+Next line will display the CPU clock time.
 The last line will be the total number of iterations it took to converge.

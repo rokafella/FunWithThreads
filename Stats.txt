@@ -1,0 +1,107 @@
+OpenMP performance on host sl5 on stdlinux:
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 1
+Actual number of threads created: 1
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 3.58239 seconds
+Total CPU clock time: 3.54 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 2
+Actual number of threads created: 2
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 2.77503 seconds
+Total CPU clock time: 5.49 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 4
+Actual number of threads created: 4
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 1.71404 seconds
+Total CPU clock time: 6.76 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 8
+Actual number of threads created: 8
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 6.99526 seconds
+Total CPU clock time: 17.41 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 16
+Actual number of threads created: 16
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 13.2933 seconds
+Total CPU clock time: 22.71 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 32
+Actual number of threads created: 32
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 24.9082 seconds
+Total CPU clock time: 35.89 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 64
+Actual number of threads created: 64
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 47.1676 seconds
+Total CPU clock time: 61.46 seconds
+Iterations: 72890
+
+
+Pthread performance on host sl5 on stdlinux:
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 1
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 7.80085 microseconds
+Total CPU clock time: 8.52 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 2
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 6.00598 microseconds
+Total CPU clock time: 10.79 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 4
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 8.63737 microseconds
+Total CPU clock time: 17.18 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 8
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 23.0121 microseconds
+Total CPU clock time: 36.86 seconds
+Iterations: 72890
+
+Boxes: 48 Rows: 16 Columns: 16
+Enter the number of threads you need: 16
+Last Min: 42.5499
+Last Max: 43.8658
+Total duration (wall clock): 100.375 microseconds
+Total CPU clock time: 121.23 seconds
+Iterations: 72890
